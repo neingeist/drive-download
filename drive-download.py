@@ -1,5 +1,10 @@
 FOLDER = '1J_Yw3ENBfDOEjiPV2LpYIa86aAPnaVx3'
 
+import sys
+if sys.version_info < (3, 3):
+    sys.stderr.write("Sorry, requires at least Python 3.3\n")
+    sys.exit(1)
+
 import os
 import shlex
 from pydrive.auth import GoogleAuth
