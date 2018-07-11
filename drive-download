@@ -7,6 +7,7 @@ if sys.version_info < (3, 3):
     sys.stderr.write("Sorry, requires at least Python 3.3\n")
     sys.exit(1)
 
+import collections
 import os
 import pickle
 import shlex
@@ -25,7 +26,15 @@ gauth.CommandLineAuth()
 drive = GoogleDrive(gauth)
 
 file_list = drive.ListFile({'q': "'{}' in parents and trashed=false".format(FOLDER)}).GetList()
-# XXX Check for filename dupes
+
+file_names = [f['title'] for f in file_list]
+file_names_dupes = [f for f, count in collections.Counter(file_names).items() if count > 1]
+if len(file_names_dupes) > 0:
+    print('Duplicate filenames on Drive!')
+    for fn in sorted(file_names_dupes):
+        print(fn)
+    sys.exit(1)
+
 for file1 in file_list:
     if file1['mimeType'] == 'application/vnd.google-apps.folder':
         continue
