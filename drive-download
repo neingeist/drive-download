@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-FOLDER = '1J_Yw3ENBfDOEjiPV2LpYIa86aAPnaVx3'
+FOLDER = '1J_Yw3ENBfDOEjiPV2LpYIa86aAPnaVx3'  # XXX Should be 1. name 2. arg
 
 import sys
 if sys.version_info < (3, 3):
@@ -25,6 +25,7 @@ gauth.CommandLineAuth()
 drive = GoogleDrive(gauth)
 
 file_list = drive.ListFile({'q': "'{}' in parents and trashed=false".format(FOLDER)}).GetList()
+# XXX Check for filename dupes
 for file1 in file_list:
     if file1['mimeType'] == 'application/vnd.google-apps.folder':
         continue
