@@ -10,7 +10,7 @@ import shlex
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 
-gauth = GoogleAuth()
+gauth = GoogleAuth(settings_file=os.path.expanduser('~/.config/drive-download/settings.yaml'))
 gauth.CommandLineAuth()
 
 drive = GoogleDrive(gauth)
