@@ -1,6 +1,7 @@
 FOLDER = '1J_Yw3ENBfDOEjiPV2LpYIa86aAPnaVx3'
 
 import os
+import shlex
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 
@@ -18,4 +19,4 @@ for file1 in file_list:
     if not os.path.exists(local_filename):
         file1.GetContentFile(local_filename)
     else:
-        raise "{} exists".format(local_filename)
+        raise RuntimeError("{} exists".format(shlex.quote(local_filename)))
