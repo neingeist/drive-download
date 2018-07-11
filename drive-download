@@ -49,4 +49,5 @@ for file1 in file_list:
         with open(os.path.expanduser('~/.local/share/drive-download/seen.pickle'), 'wb') as f:
             pickle.dump(seen, f)
     else:
-        raise RuntimeError("{} exists".format(shlex.quote(local_filename)))
+        print("{} exists locally!".format(shlex.quote(local_filename)))
+        sys.exit(2)
