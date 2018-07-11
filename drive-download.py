@@ -20,7 +20,7 @@ for file1 in file_list:
     if file1['mimeType'] == 'application/vnd.google-apps.folder':
         continue
     local_filename = file1['title']
-    print(local_filename)
+    print(shlex.quote(local_filename))
     if not os.path.exists(local_filename):
         file1.GetContentFile(local_filename)
     else:
