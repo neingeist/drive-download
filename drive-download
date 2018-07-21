@@ -7,13 +7,13 @@ if sys.version_info < (3, 3):
     sys.stderr.write("Sorry, requires at least Python 3.3\n")
     sys.exit(1)
 
-
 import collections
 import os
 import pickle
 import shlex
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
+
 
 try:
     with open(os.path.expanduser('~/.local/share/drive-download/seen.pickle'), 'rb') as f:
@@ -26,15 +26,16 @@ gauth.CommandLineAuth()
 
 drive = GoogleDrive(gauth)
 
+
 def folder_id(folder_name):
     query = "title = '%s'" % folder_name
     file1 = drive.ListFile({'q': query}).GetList()[0]
     assert file1['mimeType'] == 'application/vnd.google-apps.folder'
     return file1['id']
 
-file_list = drive.ListFile(
-        {'q': "'%s' in parents and trashed=false" % folder_id(FOLDER)}
-).GetList()
+
+file_query = "'%s' in parents and trashed=false" % folder_id(FOLDER)
+file_list = drive.ListFile({'q': file_query}).GetList()
 
 file_names = [f['title'] for f in file_list]
 file_names_dupes = [f for f, count in collections.Counter(file_names).items() if count > 1]
@@ -60,3 +61,5 @@ for file1 in file_list:
     else:
         print("{} exists locally!".format(shlex.quote(local_filename)))
         sys.exit(2)
+
+# vim:tw=100:
