@@ -37,37 +37,43 @@ def folder_id(folder_name):
     return file1['id']
 
 
-read_seen()
+def main():
+    global seen, drive
 
-gauth = GoogleAuth(settings_file=os.path.expanduser('~/.config/drive-download/settings.yaml'))
-gauth.CommandLineAuth()
-drive = GoogleDrive(gauth)
+    read_seen()
 
-file_query = "'%s' in parents and trashed=false" % folder_id(FOLDER)
-file_list = drive.ListFile({'q': file_query}).GetList()
+    gauth = GoogleAuth(settings_file=os.path.expanduser('~/.config/drive-download/settings.yaml'))
+    gauth.CommandLineAuth()
+    drive = GoogleDrive(gauth)
 
-file_names = [f['title'] for f in file_list]
-file_names_dupes = [f for f, count in collections.Counter(file_names).items() if count > 1]
-if len(file_names_dupes) > 0:
-    print('Duplicate filenames on Drive!')
-    for fn in sorted(file_names_dupes):
-        print(fn)
-    sys.exit(1)
+    file_query = "'%s' in parents and trashed=false" % folder_id(FOLDER)
+    file_list = drive.ListFile({'q': file_query}).GetList()
 
-for file1 in file_list:
-    if file1['mimeType'] == 'application/vnd.google-apps.folder':
-        continue
-    if file1['id'] in seen:  # XXX could update the file if it needs updating
-        continue
+    file_names = [f['title'] for f in file_list]
+    file_names_dupes = [f for f, count in collections.Counter(file_names).items() if count > 1]
+    if len(file_names_dupes) > 0:
+        print('Duplicate filenames on Drive!')
+        for fn in sorted(file_names_dupes):
+            print(shlex.quote(fn))
+        sys.exit(1)
 
-    local_filename = file1['title']
-    print(shlex.quote(local_filename))
-    if not os.path.exists(local_filename):
-        file1.GetContentFile(local_filename)
-        seen.add(file1['id'])
-        save_seen()
-    else:
-        print("{} exists locally!".format(shlex.quote(local_filename)))
-        sys.exit(2)
+    for file1 in file_list:
+        if file1['mimeType'] == 'application/vnd.google-apps.folder':
+            continue
+        if file1['id'] in seen:  # XXX could update the file if it needs updating
+            continue
+
+        local_filename = file1['title']
+        print(shlex.quote(local_filename))
+        if not os.path.exists(local_filename):
+            file1.GetContentFile(local_filename)
+            seen.add(file1['id'])
+            save_seen()
+        else:
+            print("{} exists locally!".format(shlex.quote(local_filename)))
+            sys.exit(2)
+
+
+main()
 
 # vim:tw=100:
