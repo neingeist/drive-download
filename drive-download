@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
-FOLDER = 'scanbot'  # XXX Should be arg
-
 import sys
 if sys.version_info < (3, 3):
     sys.stderr.write("Sorry, requires at least Python 3.3\n")
     sys.exit(1)
 
+import argparse
 import collections
 import os
 import pickle
@@ -40,13 +39,17 @@ def folder_id(folder_name):
 def main():
     global seen, drive
 
+    parser = argparse.ArgumentParser(description='Download files from a folder in Google Drive')
+    parser.add_argument('folder', type=str, help='folder to download from')
+    args = parser.parse_args()
+
     read_seen()
 
     gauth = GoogleAuth(settings_file=os.path.expanduser('~/.config/drive-download/settings.yaml'))
     gauth.CommandLineAuth()
     drive = GoogleDrive(gauth)
 
-    file_query = "'%s' in parents and trashed=false" % folder_id(FOLDER)
+    file_query = "'%s' in parents and trashed=false" % folder_id(args.folder)
     file_list = drive.ListFile({'q': file_query}).GetList()
 
     file_names = [f['title'] for f in file_list]
