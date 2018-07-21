@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Download unseen files from a folder in Google Drive
 
 import sys
 if sys.version_info < (3, 3):
@@ -39,7 +40,8 @@ def folder_id(folder_name):
 def main():
     global seen, drive
 
-    parser = argparse.ArgumentParser(description='Download files from a folder in Google Drive')
+    parser = argparse.ArgumentParser(
+        description='Download unseen files from a folder in Google Drive')
     parser.add_argument('folder', type=str, help='folder to download from')
     args = parser.parse_args()
 
