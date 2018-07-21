@@ -15,16 +15,19 @@ from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 
 
-try:
-    with open(os.path.expanduser('~/.local/share/drive-download/seen.pickle'), 'rb') as f:
-        seen = pickle.load(f)
-except FileNotFoundError:
-    seen = set()
+def read_seen():
+    global seen
+    try:
+        with open(os.path.expanduser('~/.local/share/drive-download/seen.pickle'), 'rb') as f:
+            seen = pickle.load(f)
+    except FileNotFoundError:
+        seen = set()
 
-gauth = GoogleAuth(settings_file=os.path.expanduser('~/.config/drive-download/settings.yaml'))
-gauth.CommandLineAuth()
 
-drive = GoogleDrive(gauth)
+def save_seen():
+    global seen
+    with open(os.path.expanduser('~/.local/share/drive-download/seen.pickle'), 'wb') as f:
+        pickle.dump(seen, f)
 
 
 def folder_id(folder_name):
@@ -33,6 +36,12 @@ def folder_id(folder_name):
     assert file1['mimeType'] == 'application/vnd.google-apps.folder'
     return file1['id']
 
+
+read_seen()
+
+gauth = GoogleAuth(settings_file=os.path.expanduser('~/.config/drive-download/settings.yaml'))
+gauth.CommandLineAuth()
+drive = GoogleDrive(gauth)
 
 file_query = "'%s' in parents and trashed=false" % folder_id(FOLDER)
 file_list = drive.ListFile({'q': file_query}).GetList()
@@ -56,8 +65,7 @@ for file1 in file_list:
     if not os.path.exists(local_filename):
         file1.GetContentFile(local_filename)
         seen.add(file1['id'])
-        with open(os.path.expanduser('~/.local/share/drive-download/seen.pickle'), 'wb') as f:
-            pickle.dump(seen, f)
+        save_seen()
     else:
         print("{} exists locally!".format(shlex.quote(local_filename)))
         sys.exit(2)
