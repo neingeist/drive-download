@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
-FOLDER = '1J_Yw3ENBfDOEjiPV2LpYIa86aAPnaVx3'  # XXX Should be 1. name 2. arg
+FOLDER = 'scanbot'  # XXX Should be arg
 
 import sys
 if sys.version_info < (3, 3):
     sys.stderr.write("Sorry, requires at least Python 3.3\n")
     sys.exit(1)
+
 
 import collections
 import os
@@ -25,7 +26,15 @@ gauth.CommandLineAuth()
 
 drive = GoogleDrive(gauth)
 
-file_list = drive.ListFile({'q': "'{}' in parents and trashed=false".format(FOLDER)}).GetList()
+def folder_id(folder_name):
+    query = "title = '%s'" % folder_name
+    file1 = drive.ListFile({'q': query}).GetList()[0]
+    assert file1['mimeType'] == 'application/vnd.google-apps.folder'
+    return file1['id']
+
+file_list = drive.ListFile(
+        {'q': "'%s' in parents and trashed=false" % folder_id(FOLDER)}
+).GetList()
 
 file_names = [f['title'] for f in file_list]
 file_names_dupes = [f for f, count in collections.Counter(file_names).items() if count > 1]
@@ -38,7 +47,7 @@ if len(file_names_dupes) > 0:
 for file1 in file_list:
     if file1['mimeType'] == 'application/vnd.google-apps.folder':
         continue
-    if file1['id'] in seen:
+    if file1['id'] in seen:  # XXX could update the file if it needs updating
         continue
 
     local_filename = file1['title']
