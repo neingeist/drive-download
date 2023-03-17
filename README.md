@@ -7,6 +7,12 @@ drive-download scanbot
 
 The script only downloads files it hasn't seen before.
 
+## Installation
+Preferably in a Python virtualenv:
+```
+pip install ~/path/to/drive-download/
+```
+
 ## Configuring
 1. Get Google Drive API id and secret from the Google API console.
 2. Create and edit `.config/drive-download/settings.yaml`:

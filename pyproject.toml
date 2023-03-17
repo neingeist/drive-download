@@ -1,0 +1,10 @@
+[project]
+name = "drive-download"
+version = "0"
+dynamic = ["dependencies"]
+
+[project.scripts]
+drive-download = "drive_download:main"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
